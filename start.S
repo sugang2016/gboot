@@ -51,8 +51,8 @@ reset:
 	bl disable_watchdog
 	bl disable_interrupt
 	bl disable_mmu
+	bl init_clock
 	bl light_led
-
 
 
 set_svc:
@@ -85,7 +85,24 @@ disable_mmu:
 	bic r0,r0,#0x00000007
 	mcr p15,0,r0,c1,c0,0
 	mov pc,lr
+
+	/*Init System Clock*/	
+#define MPLLCON 0x4C000004
+#define CLKDIVN 0x4c000014
+#define MPLL_405 ((127<<12)|(2<<4)|(1<<0))
+init_clock:
+	ldr r0,=CLKDIVN
+	ldr r1,=0x5
+	str r1,[r0]
 	
+	mcr p15,0,r0,c1,c0,0
+	orr r0,r0,#0xc0000000
+	mcr p15,0,r0,c1,c0,0
+	
+	ldr r0,=MPLLCON
+	ldr r1,=MPLL_405
+	str r1,[r0]
+	mov pc,lr
 	
 	
 #define GPBCON 0x56000010
