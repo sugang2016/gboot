@@ -1,6 +1,6 @@
-@
-@
-@
+@File Name :start.S
+@Author :sugang
+@Description :gboot init s3c2440
 @
 
 .text
@@ -52,6 +52,7 @@ reset:
 	bl disable_interrupt
 	bl disable_mmu
 	bl init_clock
+	bl init_men
 	bl light_led
 
 
@@ -103,6 +104,35 @@ init_clock:
 	ldr r1,=MPLL_405
 	str r1,[r0]
 	mov pc,lr
+
+	/*Init men*/
+#define men_ctl 0x48000000
+init_men:
+	ldr r0,=men_ctl
+	add r3,r0,#4*13
+	adrl r1,men_data
+	
+0:
+	ldr r2,[r1],#4
+	str r2,[r0],#4
+	cmp r0,r3
+	bne 0b
+	mov pc,lr
+	
+men_data:
+	.long 0x22000000
+	.long 0x00000700
+	.long 0x00000700
+	.long 0x00000700
+	.long 0x00000700
+	.long 0x00000700
+	.long 0x00000700
+	.long 0x00018001
+	.long 0x00018001
+	.long 0x008C04F5
+	.long 0x000000B1
+	.long 0x00000030
+	.long 0x00000030
 	
 	
 #define GPBCON 0x56000010
