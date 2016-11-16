@@ -133,8 +133,22 @@ men_data:
 	.long 0x000000B1
 	.long 0x00000030
 	.long 0x00000030
+
+	/*Copy code to ram*/
+init_ram:
+	ldr r0,=0x00000000
+	ldr r1,=0x30008000
+	add r3,r0,#1024*4
 	
+copy_loop:
+	ldr r2,[r0],#4
+	str r2,[r1],#4
+	cmp r0,r3
+	bne copy_loop
 	
+	mov pc,lr
+
+
 #define GPBCON 0x56000010
 #define GPBDAT 0x56000014
 
