@@ -53,6 +53,7 @@ reset:
 	bl disable_mmu
 	bl init_clock
 	bl init_men
+	bl init_stack
 	bl light_led
 
 
@@ -148,6 +149,9 @@ copy_loop:
 	
 	mov pc,lr
 
+init_stack:
+	ldr sp,=0x34000000
+	mov pc,lr
 
 #define GPBCON 0x56000010
 #define GPBDAT 0x56000014
