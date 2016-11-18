@@ -53,8 +53,11 @@ reset:
 	bl disable_mmu
 	bl init_clock
 	bl init_men
+	bl copy_to_ram
 	bl init_stack
-	bl light_led
+	bl clear_bss
+	ldr pc,=main
+	//bl light_led
 
 
 set_svc:
@@ -89,7 +92,7 @@ disable_mmu:
 	mov pc,lr
 
 	/*Init System Clock*/	
-#define MPLLCON 0x4C000004
+#define MPLLCON 0x4c000004
 #define CLKDIVN 0x4c000014
 #define MPLL_405 ((127<<12)|(2<<4)|(1<<0))
 init_clock:
@@ -136,7 +139,7 @@ men_data:
 	.long 0x00000030
 
 	/*Copy code to ram*/
-init_ram:
+copy_to_ram:
 	ldr r0,=0x00000000
 	ldr r1,=0x30008000
 	add r3,r0,#1024*4
@@ -166,7 +169,7 @@ clear_loop:
 	cmp r0,r1
 	bne clear_loop
 	mov pc,lr
-
+/*
 #define GPBCON 0x56000010
 #define GPBDAT 0x56000014
 
@@ -179,7 +182,7 @@ light_led:
 	ldr r1,=0x61f
 	str r1,[r0]
 	mov pc,lr
-
+*/
 
 
 
