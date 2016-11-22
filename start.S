@@ -1,9 +1,9 @@
+@****************************************************************************
 @File Name :start.S
 @Author :sugang
 @Description :gboot init s3c2440
-@
-
-.text
+@**************************************************************************
+ .text
 .global _start
 _start:
 	b reset
@@ -43,7 +43,11 @@ data_abort:
 not_used:
 	nop
 irq:
-	nop
+	sub lr,lr,#4	/*保存环境*/
+	stmfd sp!,{r0-r12,lr}
+	bl handle_init
+	ldmfd sp!,{r0-r12,pc}^
+	
 fiq:
 	nop
 reset:
@@ -97,10 +101,10 @@ disable_mmu:
 #define MPLL_405 ((127<<12)|(2<<4)|(1<<0))
 init_clock:
 	ldr r0,=CLKDIVN
-	ldr r1,=0x5
+	mov r1,#0x5
 	str r1,[r0]
 	
-	mcr p15,0,r0,c1,c0,0
+	mrc p15,0,r0,c1,c0,0
 	orr r0,r0,#0xc0000000
 	mcr p15,0,r0,c1,c0,0
 	
@@ -148,12 +152,14 @@ copy_loop:
 	ldr r2,[r0],#4
 	str r2,[r1],#4
 	cmp r0,r3
-	bne copy_loop
-	
+	bne copy_loop	
 	mov pc,lr
 
 init_stack:
-	ldr sp,=0x34000000
+	msr cpsr_c,#0xd2
+	ldr sp,=0x33000000 //初始化为r13_irq
+	msr cpsr_c,#0xd3 
+	ldr sp,=0x34000000 //初始化为r13_svc
 	mov pc,lr
 	
 	/*Clear Bss*/

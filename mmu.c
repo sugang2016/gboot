@@ -1,30 +1,38 @@
-#define GPBCON (*(volatile unsigned long *)0xA0000010)
-#define GPBDAT (*(volatile unsigned long *)0xA0000014)
-
 #define MMU_FULL_ACCESS  	 ( 3<<10)
 #define MMU_DOMAIN				 ( 0<<5 )
 #define MMU_SPECIAL				 ( 1<<4 )
 #define MMU_CACHEABLE 		 ( 1<<3 )
-#define MMU_BUFFEANBLE		 ( 1<<2 )
+#define MMU_BUFFERABLE		 ( 1<<2 )
 #define MMU_SECTION 			 ( 2<<0 )
 
-#define MMU_SECDESC  MMU_SECTION|MMU_DOMAIN|MMU_FULL_ACCESS
-#define MMU_SECDESC_WB  MMU_SECTION|MMU_DOMAIN|MMU_FULL_ACCESS|MMU_CACHEABLE|MMU_BUFFEANBLE
+#define MMU_SECDESC  			 (MMU_FULL_ACCESS|MMU_DOMAIN|MMU_SPECIAL|MMU_SECTION)
+#define MMU_SECDESC_WB  	 (MMU_FULL_ACCESS|MMU_DOMAIN|MMU_SPECIAL|MMU_CACHEABLE|MMU_BUFFERABLE|MMU_SECTION)
 
 	/*1.建立页表*/
-void create_page_table()
+void create_page_table(void)
 {
 	/*对GPIO地址映射*/
 	unsigned long *ttb =(unsigned long *)0x30000000;
 	unsigned long vaddr,paddr;
+	
+	vaddr =0x00000000;
+	paddr =0x30000000;
+	
+	*(ttb + (vaddr >>20)) = (paddr&0xfff00000)|MMU_SECDESC_WB;
+	
 	vaddr =0xA0000000;
 	paddr =0x56000000;
 	
 	*(ttb + (vaddr >>20)) = (paddr&0xfff00000)|MMU_SECDESC;
 	
+	vaddr =0x4A000000;
+	paddr =0x4A000000;
+	
+	*(ttb + (vaddr >>20)) = (paddr&0xfff00000)|MMU_SECDESC;
+	
 	/*对内存地址映射*/
-	vaddr =0x00000000;
-	paddr =0x00000000;
+	vaddr =0x30000000;
+	paddr =0x30000000;
 	
 	while(vaddr < 0x34000000)
 	{
@@ -56,13 +64,11 @@ void mmu_enable()
 
 }
 
-int main()
+void mmu_init()
 {
 	create_page_table();
+	
 	mmu_enable();
 	
-	GPBCON = 0x15400;
-	GPBDAT = 0x61f;
-	return 0;
-	
 }
+
