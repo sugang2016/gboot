@@ -6,7 +6,10 @@ int main()
 	
 	led_init();
 	button_init();
+	beep_init();
 	init_irq();
+	
+	NF_Test();	//≤‚ ‘nand flash∂¡–¥
 	
 	while(1);
 	

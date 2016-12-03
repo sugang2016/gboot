@@ -16,20 +16,13 @@ _start:
 	ldr pc,_fiq
 
 
-_undefined_instruction: 
-	.word undefined_instruction
-_software_interrupt:
-	.word software_interrupt
-_prefetch_abort: 
-	.word prefetch_abort
-_data_abort:
-	.word data_abort
-_not_used:
-	.word not_used
-_irq:
-	.word irq
-_fiq:
-	.word fiq
+_undefined_instruction: .word undefined_instruction
+_software_interrupt: .word software_interrupt
+_prefetch_abort: .word prefetch_abort
+_data_abort: .word data_abort
+_not_used: .word not_used
+_irq: .word irq
+_fiq: .word fiq
 
 
 undefined_instruction:
@@ -56,12 +49,13 @@ reset:
 	bl disable_interrupt
 	bl disable_mmu
 	bl init_clock
-	bl init_men
-	bl copy_to_ram
+	bl init_sdram
 	bl init_stack
+	bl nand_init
+	bl copy_to_ram
 	bl clear_bss
 	ldr pc,=main
-	//bl light_led
+	@bl light_led
 
 
 set_svc:
@@ -115,7 +109,7 @@ init_clock:
 
 	/*Init men*/
 #define men_ctl 0x48000000
-init_men:
+init_sdram:
 	ldr r0,=men_ctl
 	add r3,r0,#4*13
 	adrl r1,men_data
@@ -144,15 +138,14 @@ men_data:
 
 	/*Copy code to ram*/
 copy_to_ram:
-	ldr r0,=0x00000000
-	ldr r1,=0x30008000
-	add r3,r0,#1024*4
+	mov r0, #0
+	ldr r1, =_start
+	ldr r2, =bss_end
+	sub r2, r2,r1
 	
-copy_loop:
-	ldr r2,[r0],#4
-	str r2,[r1],#4
-	cmp r0,r3
-	bne copy_loop	
+	mov ip,lr		
+	bl nand_to_ram
+	mov lr,ip
 	mov pc,lr
 
 init_stack:
@@ -175,7 +168,7 @@ clear_loop:
 	cmp r0,r1
 	bne clear_loop
 	mov pc,lr
-/*
+
 #define GPBCON 0x56000010
 #define GPBDAT 0x56000014
 
@@ -188,7 +181,7 @@ light_led:
 	ldr r1,=0x61f
 	str r1,[r0]
 	mov pc,lr
-*/
+
 
 
 
