@@ -10,6 +10,8 @@ int main()
 	beep_init();
 	init_irq();
 	uart_init();
+	dma_init();
+	dma_start();
 	
 	while(1)
 	{
