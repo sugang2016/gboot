@@ -4,14 +4,16 @@ int main()
 #ifdef MMU_ON
 	mmu_init();
 #endif
-	
+
 	led_init();
 	button_init();
 	beep_init();
 	init_irq();
 	uart_init();
-	dma_init();
-	dma_start();
+	lcd_init();
+	touch_init();
+
+
 	
 	while(1)
 	{

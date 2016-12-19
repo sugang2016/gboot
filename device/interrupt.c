@@ -50,6 +50,9 @@ void handle_init()
 			led2_on();
 		  beep_off();
 			break;
+		case 31:
+			touch_handle();
+			break;
 		default:
 			break;
 			

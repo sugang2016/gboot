@@ -128,7 +128,7 @@ void lcd_test()
 	
 	delay(2000000);
 	
-	print_bmp(0,0,480,272,bmp);
+//	print_bmp(0,0,480,272,bmp);
 	
 	
 	while(1)
