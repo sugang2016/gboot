@@ -41,14 +41,13 @@ void handle_init()
 			break;
 		case 1:	//K1
 			led1_on();
-		  beep_on();
 			break;
 		case 2:	//K3
 			led3_on();
 			break;
 		case 4:	//K2
-			led2_on();
-		  beep_off();
+			//led2_on();
+			int_issus();
 			break;
 		case 31:
 			touch_handle();
